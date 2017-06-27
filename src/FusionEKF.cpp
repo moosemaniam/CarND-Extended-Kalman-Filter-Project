@@ -40,6 +40,47 @@ FusionEKF::FusionEKF() {
 
 }
 
+/* ----------------------------------------------------------------------*/
+/**
+ * @Description calculates range
+ *
+ * @Param measurement_pack
+ *
+ */
+/* ----------------------------------------------------------------------*/
+static float calculate_range(const MeasurementPackage &measurement_pack){
+  float px = measurement_pack.raw_measurements_[0];
+  float py = measurement_pack.raw_measurements_[1];
+
+  return(sqrt(px*px+py*py));
+
+}
+
+/* ----------------------------------------------------------------------*/
+/**
+ * @Description
+ *
+ * @Param measurement_pack
+ *
+ * @Returns
+ */
+/* ----------------------------------------------------------------------*/
+static float calculate_bearing(const MeasurementPackage &measurement_pack){
+  float px = measurement_pack.raw_measurements_[0];
+  float py = measurement_pack.raw_measurements_[1];
+
+  return(atan(py/px));
+
+}
+
+static float calculate_range_rate(const MeasurementPackage &measurement_pack){
+  float px = measurement_pack.raw_measurements_[0];
+  float py = measurement_pack.raw_measurements_[1];
+  float vx = measurement_pack.raw_measurements_[2];
+  float vy = measurement_pack.raw_measurements_[3];
+
+  return((px * vx + py * vy)/(sqrt(px*px+py*py)));
+}
 /**
 * Destructor.
 */
@@ -59,7 +100,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       * Remember: you'll need to convert radar from polar to cartesian coordinates.
     */
     // first measurement
-    cout << "EKF: " << endl;
+    cout << "EKF:" << measurement_pack.raw_measurements_ << endl;
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1, 1, 1, 1;
 
@@ -72,6 +113,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Initialize state.
       */
+      ekf_.x_ = measurement_pack.raw_measurements_;
     }
 
     // done initializing, no need to predict or update
