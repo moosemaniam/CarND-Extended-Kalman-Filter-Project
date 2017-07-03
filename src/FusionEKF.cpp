@@ -115,9 +115,12 @@ TODO:
    * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
    */
 
-  float dt = measurement_pack.timestamp_ - previous_timestamp_;
+   /* dt in micro seconds */
+  float dt = (measurement_pack.timestamp_ - previous_timestamp_)/1000000;
   previous_timestamp_ = measurement_pack.timestamp_;
   printf("Time stamp %lld\n",previous_timestamp_);
+  fflush(stdout);
+  fflush(stderr);
 
   ekf_.F_ = MatrixXd(4,4);
   ekf_.F_ << 1,0,dt,0,
@@ -131,11 +134,16 @@ TODO:
   float dt_4 = dt_3 * dt;
 
   ekf_.Q_ = MatrixXd(4,4);
+  printf("Q matrix allocated");
 
-  ekf_.Q_ << dt_4*ax/4,0,dt_3*ax/2,0,
-           0,dt_4*ay/4,0,dt_3*ay/2,
-           0,dt_3*ay/2,0,dt_2 * ay;
+  fflush(stdout);
+  fflush(stderr);
+  ekf_.Q_ << dt_4*ax/4, 0,        dt_3*ax/2,   0,
+           0,           dt_4*ay/4,0,           dt_3*ay/2,
+           dt_3*ax/2,   0,        dt * ax,     0,
+           0,           dt_3*ay/2,0,           dt_2 * ay;
 
+  printf("Q matrix init done");
   ekf_.Predict();
 
   /*****************************************************************************

@@ -74,7 +74,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
   float rho = sqrt(x_(0) * x_(0) + x_(1)*x_(1));
   float theta = atan(x_(1)/x_(0));
-  float rho_d= (x_(0)*x_(2) + x_(1)*x_(2))/rho;
+  float rho_d= (x_(0)*x_(2) + x_(1)*x_(3))/rho;
 
 #ifdef DEBUGGING_CODE
   std::cout << "KalmanFilter:Update enter"<<endl;
