@@ -119,6 +119,7 @@ TODO:
   previous_timestamp_ = measurement_pack.timestamp_;
   printf("Time stamp %lld\n",previous_timestamp_);
 
+  ekf_.F_ = MatrixXd(4,4);
   ekf_.F_ << 1,0,dt,0,
             0,1,0,dt,
             0,0,1,0,
