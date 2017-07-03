@@ -69,3 +69,50 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 
   return Hj;
 }
+/* ----------------------------------------------------------------------*/
+/**
+ * @Description calculates range
+ *
+ * @Param measurement_pack
+ *
+ */
+/* ----------------------------------------------------------------------*/
+float calculate_range(const MeasurementPackage &measurement_pack){
+  float px = measurement_pack.raw_measurements_[0];
+  float py = measurement_pack.raw_measurements_[1];
+
+  return(sqrt(px*px+py*py));
+}
+/* ----------------------------------------------------------------------*/
+/**
+ * @Description
+ *
+ * @Param measurement_pack
+ *
+ * @Returns
+ */
+/* ----------------------------------------------------------------------*/
+float calculate_bearing(const MeasurementPackage &measurement_pack){
+  float px = measurement_pack.raw_measurements_[0];
+  float py = measurement_pack.raw_measurements_[1];
+
+  return(atan(py/px));
+
+}
+
+float calculate_range_rate(const MeasurementPackage &measurement_pack){
+  float px = measurement_pack.raw_measurements_[0];
+  float py = measurement_pack.raw_measurements_[1];
+  float vx = measurement_pack.raw_measurements_[2];
+  float vy = measurement_pack.raw_measurements_[3];
+
+  return((px * vx + py * vy)/(sqrt(px*px+py*py)));
+}
+
+VectorXd Tools::cartesian_to_polar(const MeasurementPackage &measurement_pack){
+  VectorXd polar(3);
+  polar(0) = calculate_range(measurement_pack);
+  polar(1) = calculate_bearing(measurement_pack);
+  polar(2) = calculate_range_rate(measurement_pack);
+  return polar;
+}
