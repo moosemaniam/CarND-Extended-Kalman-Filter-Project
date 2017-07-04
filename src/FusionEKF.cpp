@@ -8,6 +8,7 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using std::vector;
 
+#define MIN_VAL 0.0001
 /*
  * Constructor.
  */
@@ -88,6 +89,11 @@ TODO:
         Initialize state.
         */
       ekf_.x_ << measurement_pack.raw_measurements_[0],measurement_pack.raw_measurements_[1],0,0;
+      if(ekf_.x_[0] < MIN_VAL)
+        ekf_.x_[0] = MIN_VAL;
+
+      if(ekf_.x_[1] < MIN_VAL)
+        ekf_.x_[1] = MIN_VAL;
     }
 
     ekf_.P_ = MatrixXd(4,4);
@@ -116,7 +122,7 @@ TODO:
    */
 
    /* dt in micro seconds */
-  float dt = (measurement_pack.timestamp_ - previous_timestamp_)/1000000;
+  float dt = (measurement_pack.timestamp_ - previous_timestamp_)/1000000.0;
   previous_timestamp_ = measurement_pack.timestamp_;
   printf("Time stamp %lld\n",previous_timestamp_);
   fflush(stdout);
