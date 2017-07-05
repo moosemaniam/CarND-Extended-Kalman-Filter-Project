@@ -31,14 +31,6 @@ FusionEKF::FusionEKF() {
   R_radar_ << 0.09, 0, 0,
            0, 0.0009, 0,
            0, 0, 0.09;
-
-  /**
-TODO:
-   * Finish initializing the FusionEKF.
-   * Set the process and measurement noises
-   */
-
-
 }
 
 
@@ -89,13 +81,15 @@ TODO:
         Initialize state.
         */
       ekf_.x_ << measurement_pack.raw_measurements_[0],measurement_pack.raw_measurements_[1],0,0;
-      if(ekf_.x_[0] < MIN_VAL)
-        ekf_.x_[0] = MIN_VAL;
-
-      if(ekf_.x_[1] < MIN_VAL)
-        ekf_.x_[1] = MIN_VAL;
     }
 
+    if(ekf_.x_[0] < MIN_VAL)
+      ekf_.x_[0] = MIN_VAL;
+
+    if(ekf_.x_[1] < MIN_VAL)
+      ekf_.x_[1] = MIN_VAL;
+
+    cout <<"EKF start value "<< ekf_.x_ << endl;
     ekf_.P_ = MatrixXd(4,4);
 
     ekf_.P_ << 1,0,0,0,
@@ -121,18 +115,15 @@ TODO:
    * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
    */
 
-   /* dt in micro seconds */
+  /* dt in micro seconds */
   float dt = (measurement_pack.timestamp_ - previous_timestamp_)/1000000.0;
   previous_timestamp_ = measurement_pack.timestamp_;
-  printf("Time stamp %lld\n",previous_timestamp_);
-  fflush(stdout);
-  fflush(stderr);
 
   ekf_.F_ = MatrixXd(4,4);
   ekf_.F_ << 1,0,dt,0,
-            0,1,0,dt,
-            0,0,1,0,
-            0,0,0,1;
+    0,1,0,dt,
+    0,0,1,0,
+    0,0,0,1;
 
   float ax = 9.0,ay = 9.0;
   float dt_2 = dt * dt;
@@ -140,16 +131,11 @@ TODO:
   float dt_4 = dt_3 * dt;
 
   ekf_.Q_ = MatrixXd(4,4);
-  printf("Q matrix allocated");
-
-  fflush(stdout);
-  fflush(stderr);
   ekf_.Q_ << dt_4*ax/4, 0,        dt_3*ax/2,   0,
-           0,           dt_4*ay/4,0,           dt_3*ay/2,
-           dt_3*ax/2,   0,        dt * ax,     0,
-           0,           dt_3*ay/2,0,           dt_2 * ay;
+    0,           dt_4*ay/4,0,           dt_3*ay/2,
+    dt_3*ax/2,   0,        dt_2 * ax,     0,
+    0,           dt_3*ay/2,0,           dt_2 * ay;
 
-  printf("Q matrix init done");
   ekf_.Predict();
 
   /*****************************************************************************
@@ -164,18 +150,19 @@ TODO:
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // Radar updates
-      ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
-      ekf_.R_ = R_radar_;
-      ekf_.UpdateEKF(measurement_pack.raw_measurements_);
-  } else {
+    ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
+    ekf_.R_ = R_radar_;
+    ekf_.UpdateEKF(measurement_pack.raw_measurements_);
+  }
+  else {
     // Laser updates
     //
-      ekf_.H_ = H_laser_;
-      ekf_.R_ = R_laser_;
-      ekf_.Update(measurement_pack.raw_measurements_);
+    ekf_.H_ = H_laser_;
+    ekf_.R_ = R_laser_;
+    ekf_.Update(measurement_pack.raw_measurements_);
   }
 
   // print the output
-  cout << "x_ = " << ekf_.x_ << endl;
-  cout << "P_ = " << ekf_.P_ << endl;
+  //cout << "x_ = " << ekf_.x_ << endl;
+  //cout << "P_ = " << ekf_.P_ << endl;
 }

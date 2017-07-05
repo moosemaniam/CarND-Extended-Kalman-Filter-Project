@@ -2,7 +2,7 @@
 #define KALMAN_FILTER_H_
 #include "Eigen/Dense"
 
-#define DEBUGGING_CODE
+//#define DEBUGGING_CODE
 
 class KalmanFilter {
   public:

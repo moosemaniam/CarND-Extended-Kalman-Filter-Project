@@ -1,5 +1,7 @@
+#include "tools.h"
 #include "kalman_filter.h"
-
+#define THRESHOLD_VAL 0.001
+#define THRESHOLD_VAL_SQROOT 0.00001
 #include <iostream>
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -8,6 +10,7 @@ using namespace std;
 KalmanFilter::KalmanFilter() {}
 
 KalmanFilter::~KalmanFilter() {}
+
 
 void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
                         MatrixXd &H_in, MatrixXd &R_in, MatrixXd &Q_in) {
@@ -28,7 +31,7 @@ void KalmanFilter::Predict() {
   P_ = F_ * P_ * Ft + Q_;
 
 #ifdef DEBUGGING_CODE
-  std::cout << "KalmanFilter:Predict exit"<<endl;
+  std::cout << "KalmanFilter:Predict "<<endl << P_<<endl;
 #endif
 }
 
@@ -42,7 +45,7 @@ void KalmanFilter::KFCommonUpdate(const VectorXd &y){
   MatrixXd K = PHt * Si;
 
 #ifdef DEBUGGING_CODE
-  std::cout << "KalmanFilter:KFCommonUpdat enter"<<endl;
+  std::cout << "KalmanFilter:KFCommonUpdate enter"<<endl;
 #endif
   //new estimate
   x_ = x_ + (K * y);
@@ -70,10 +73,29 @@ void KalmanFilter::Update(const VectorXd &z) {
   }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
+
+  Tools tools;
   VectorXd h(3);
 
+  if(fabs(x_(0)) < THRESHOLD_VAL){
+    x_(0) = THRESHOLD_VAL;
+  }
+
+  if(fabs(x_(1)) < THRESHOLD_VAL){
+    x_(1) = THRESHOLD_VAL;
+  }
+
   float rho = sqrt(x_(0) * x_(0) + x_(1)*x_(1));
-  float theta = atan(x_(1)/x_(0));
+
+  if(fabs(rho) < THRESHOLD_VAL){
+    rho = THRESHOLD_VAL;
+  }
+
+  float theta = atan2(x_(1),x_(0));
+
+  assert(theta > -M_PI && theta < M_PI);
+  assert(rho > 0.0);
+
   float rho_d= (x_(0)*x_(2) + x_(1)*x_(3))/rho;
 
 #ifdef DEBUGGING_CODE
@@ -81,6 +103,14 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 #endif
   h << rho,theta,rho_d;
   VectorXd y = z - h;
+
+
+
+  y(1) = tools.normalize_to_pi(y(1));
+
+ if(y(1) < -M_PI || y(1) > M_PI){
+   printf("value of theta %f\n",y(1));
+ }
 
   KFCommonUpdate(y);
 

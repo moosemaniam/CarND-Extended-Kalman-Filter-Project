@@ -61,15 +61,24 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
     py = MIN_VAL;
 
   float c1 = px*px+py*py;
-    //check division by zero
+  //check division by zero
   if(fabs(c1) < MIN_VAL){
     c1 = MIN_VAL;
   }
 
 
   float c2 = sqrt(c1);
+
+  if(fabs(c2) < MIN_VAL){
+    c2 = MIN_VAL;
+  }
+
   float c3 = (c1*c2);
 
+
+  if(fabs(c3) < MIN_VAL){
+    c3 = MIN_VAL;
+  }
 
 
   //compute the Jacobian matrix
@@ -81,50 +90,16 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 
   return Hj;
 }
-/* ----------------------------------------------------------------------*/
-/**
- * @Description calculates range
- *
- * @Param measurement_pack
- *
- */
-/* ----------------------------------------------------------------------*/
-float calculate_range(const MeasurementPackage &measurement_pack){
-  float px = measurement_pack.raw_measurements_[0];
-  float py = measurement_pack.raw_measurements_[1];
 
-  return(sqrt(px*px+py*py));
-}
-/* ----------------------------------------------------------------------*/
-/**
- * @Description
- *
- * @Param measurement_pack
- *
- * @Returns
- */
-/* ----------------------------------------------------------------------*/
-float calculate_bearing(const MeasurementPackage &measurement_pack){
-  float px = measurement_pack.raw_measurements_[0];
-  float py = measurement_pack.raw_measurements_[1];
 
-  return(atan(py/px));
+float Tools::normalize_to_pi(float angle){
 
-}
+  while(angle >M_PI)
+    angle -= 2*M_PI;
 
-float calculate_range_rate(const MeasurementPackage &measurement_pack){
-  float px = measurement_pack.raw_measurements_[0];
-  float py = measurement_pack.raw_measurements_[1];
-  float vx = measurement_pack.raw_measurements_[2];
-  float vy = measurement_pack.raw_measurements_[3];
+  while(angle < -M_PI)
+    angle += 2*M_PI;
 
-  return((px * vx + py * vy)/(sqrt(px*px+py*py)));
-}
-
-VectorXd Tools::cartesian_to_polar(const MeasurementPackage &measurement_pack){
-  VectorXd polar(3);
-  polar(0) = calculate_range(measurement_pack);
-  polar(1) = calculate_bearing(measurement_pack);
-  polar(2) = calculate_range_rate(measurement_pack);
-  return polar;
+  assert(angle > -M_PI && angle < M_PI);
+  return angle;
 }
