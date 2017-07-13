@@ -21,6 +21,9 @@ FusionEKF::FusionEKF() {
   R_laser_ = MatrixXd(2, 2);
   R_radar_ = MatrixXd(3, 3);
   H_laser_ = MatrixXd(2, 4);
+  H_laser_ << 1,0,0,0,
+             0,1,0,0;
+
   Hj_ = MatrixXd(3, 4);
 
   //measurement covariance matrix - laser
@@ -126,9 +129,9 @@ TODO:
     0,0,0,1;
 
   float ax = 9.0,ay = 9.0;
-  float dt_2 = dt * dt;
-  float dt_3 = dt_2 * dt;
-  float dt_4 = dt_3 * dt;
+  const float dt_2 = dt * dt;
+  const float dt_3 = dt_2 * dt;
+  const float dt_4 = dt_3 * dt;
 
   ekf_.Q_ = MatrixXd(4,4);
   ekf_.Q_ << dt_4*ax/4, 0,        dt_3*ax/2,   0,
@@ -163,6 +166,6 @@ TODO:
   }
 
   // print the output
-  //cout << "x_ = " << ekf_.x_ << endl;
-  //cout << "P_ = " << ekf_.P_ << endl;
+  cout << "x_ = " << ekf_.x_ << endl;
+  cout << "P_ = " << ekf_.P_ << endl;
 }

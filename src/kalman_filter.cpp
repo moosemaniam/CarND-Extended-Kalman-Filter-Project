@@ -43,7 +43,6 @@ void KalmanFilter::KFCommonUpdate(const VectorXd &y){
   MatrixXd Si = S.inverse();
   MatrixXd PHt = P_ * Ht;
   MatrixXd K = PHt * Si;
-
 #ifdef DEBUGGING_CODE
   std::cout << "KalmanFilter:KFCommonUpdate enter"<<endl;
 #endif
@@ -104,13 +103,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   h << rho,theta,rho_d;
   VectorXd y = z - h;
 
-
-
   y(1) = tools.normalize_to_pi(y(1));
-
- if(y(1) < -M_PI || y(1) > M_PI){
-   printf("value of theta %f\n",y(1));
- }
 
   KFCommonUpdate(y);
 
