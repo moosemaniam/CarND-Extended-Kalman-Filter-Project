@@ -56,7 +56,7 @@ TODO:
      * Remember: you'll need to convert radar from polar to cartesian coordinates.
      */
     // first measurement
-    cout << "EKF:" << measurement_pack.raw_measurements_ << endl;
+    /* cout << "EKF:" << measurement_pack.raw_measurements_ << endl; */
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1, 1, 1, 1;
 
@@ -92,7 +92,7 @@ TODO:
     if(ekf_.x_[1] < MIN_VAL)
       ekf_.x_[1] = MIN_VAL;
 
-    cout <<"EKF start value "<< ekf_.x_ << endl;
+    /* cout <<"EKF start value "<< ekf_.x_ << endl; */
     ekf_.P_ = MatrixXd(4,4);
 
     ekf_.P_ << 1,0,0,0,
@@ -166,6 +166,6 @@ TODO:
   }
 
   // print the output
-  cout << "x_ = " << ekf_.x_ << endl;
-  cout << "P_ = " << ekf_.P_ << endl;
+  /* cout << "x_ = " << ekf_.x_ << endl; */
+  /* cout << "P_ = " << ekf_.P_ << endl; */
 }
